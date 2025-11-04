@@ -12,7 +12,7 @@ print("\nInitial DataFrame Head:")
 print(df.head())
 
 # --- 1. Renaming Columns for Clarity ---
-# A common practice is to standardize column names.
+
 df = df.rename(columns={
     'Internal ID': 'Internal_ID',
     'Name': 'Product_Name',

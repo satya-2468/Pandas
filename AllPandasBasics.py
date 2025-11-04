@@ -22,7 +22,7 @@ import pandas as pd
 import numpy as np
 
 # ----------------------------- 1. Create Messy Sample Data -----------------------------
-# We'll create a small but intentionally messy dataset to demonstrate cleaning.
+
 
 raw_data = {
     "id": [1, 2, 3, 4, 5, 6],

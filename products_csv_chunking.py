@@ -34,7 +34,7 @@ for i, chunk in enumerate(chunk_iterator):
     }, inplace=True)
 
     # 2. Handling Missing Values
-    # Corrected line to avoid the FutureWarning
+
     chunk['Description'] = chunk['Description'].fillna('No Description Provided', inpalce =True)
 
     # Dropping rows with missing EAN is not a chained assignment, so inplace is fine
