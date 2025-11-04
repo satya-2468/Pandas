@@ -1,0 +1,154 @@
+import pandas as pd
+import requests
+from dotenv import load_dotenv
+import os
+import logging
+import sys
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+
+# Load environment variables from .env file
+load_dotenv()
+
+# --- Configuration ---
+API_KEY = os.getenv("API_KEY")
+CSV_FILE_PATH = os.getenv("CSV_FILE_PATH")
+FREE_API_URL = "https://jsonplaceholder.typicode.com/posts" # A free, dummy API for demonstration
+
+# --- Data Extraction Functions ---
+
+def fetch_data_from_api(url: str) -> pd.DataFrame | None:
+    """
+    Fetches data from a specified API endpoint and returns a DataFrame.
+    Returns None if the API call fails or no data is found.
+    """
+    logging.info(f"Attempting to fetch data from API: {url}")
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()  # Raises HTTPError for bad responses (4xx or 5xx)
+
+        data = response.json()
+        if not data:
+            logging.warning("API call successful, but no data was returned.")
+            return None
+
+        return pd.DataFrame(data)
+
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error fetching data from API: {e}")
+        return None
+    except ValueError as e:
+        logging.error(f"Error decoding JSON from API response: {e}")
+        return None
+
+def load_data_from_csv(file_path: str) -> pd.DataFrame | None:
+    """
+    Loads data from a local CSV file into a DataFrame.
+    Returns None if the file is not found or is empty.
+    """
+    logging.info(f"Attempting to load data from CSV file: {file_path}")
+    if not os.path.exists(file_path):
+        logging.error(f"CSV file not found at: {file_path}")
+        return None
+    
+    try:
+        df = pd.read_csv(file_path)
+        if df.empty:
+            logging.warning("CSV file found, but it is empty.")
+            return None
+            
+        return df
+
+    except pd.errors.EmptyDataError:
+        logging.warning("CSV file found, but it is empty.")
+        return None
+    except pd.errors.ParserError as e:
+        logging.error(f"Error parsing CSV file: {e}")
+        return None
+    except Exception as e:
+        logging.error(f"An unexpected error occurred while loading CSV: {e}")
+        return None
+
+# --- Data Transformation Function ---
+
+def transform_and_clean_data(df: pd.DataFrame) -> pd.DataFrame | None:
+    """
+    Performs data cleaning and transformation using Pandas.
+    Returns the cleaned DataFrame or None if the input is invalid.
+    """
+    if df is None or df.empty:
+        logging.warning("No data to transform. Returning None.")
+        return None
+
+    try:
+        # Example transformations:
+        # 1. Rename columns for clarity
+        df = df.rename(columns={'id': 'post_id', 'userId': 'user_id'})
+        
+        # 2. Handle missing values (e.g., fill with a default value)
+        df['body'] = df['body'].fillna('No Content')
+        
+        # 3. Convert data types if necessary (e.g., to string)
+        df['user_id'] = df['user_id'].astype(str)
+
+        # 4. Remove duplicate rows based on a key column
+        df = df.drop_duplicates(subset=['post_id'])
+
+        logging.info("Data transformation and cleaning completed.")
+        return df
+    
+    except Exception as e:
+        logging.error(f"An error occurred during data transformation: {e}")
+        return None
+
+# --- Main Execution Block ---
+
+def main():
+    """
+    Main function to orchestrate the data extraction, cleaning, and processing.
+    """
+    logging.info("Starting data processing pipeline.")
+
+    # 1. Extract data from API
+    api_df = fetch_data_from_api(FREE_API_URL)
+
+    # 2. Extract data from local CSV
+    # The code assumes a CSV file named `sample.csv` is in D:\samples
+    csv_file_path = "D:\\samples\\sample.csv" 
+    csv_df = load_data_from_csv(csv_file_path)
+
+    # 3. Process extracted data
+    if api_df is not None and not api_df.empty:
+        logging.info("API data is available. Starting transformation.")
+        cleaned_api_df = transform_and_clean_data(api_df)
+        if cleaned_api_df is not None:
+            logging.info("Successfully processed API data.")
+            print("\n--- Processed API Data ---")
+            print(cleaned_api_df.head())
+        else:
+            logging.error("Failed to process API data.")
+
+    if csv_df is not None and not csv_df.empty:
+        logging.info("CSV data is available. Starting transformation.")
+        cleaned_csv_df = transform_and_clean_data(csv_df)
+        if cleaned_csv_df is not None:
+            logging.info("Successfully processed CSV data.")
+            print("\n--- Processed CSV Data ---")
+            print(cleaned_csv_df.head())
+        else:
+            logging.error("Failed to process CSV data.")
+            
+    if api_df is None and csv_df is None:
+        logging.warning("No data was successfully extracted from any source.")
+
+    logging.info("Data processing pipeline finished.")
+
+if __name__ == "__main__":
+    main()
