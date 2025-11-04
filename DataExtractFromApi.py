@@ -17,13 +17,13 @@ logging.basicConfig(
 # Load environment variables from .env file
 load_dotenv()
 
-# --- Configuration ---
+# --- Configuration 
 API_KEY = os.getenv("API_KEY")
 CSV_FILE_PATH = os.getenv("CSV_FILE_PATH")
 API_URL = os.getenv("API_URL")
-FREE_API_URL = "https://jsonplaceholder.typicode.com/posts" # A free, dummy API for demonstration
+FREE_API_URL = "https://jsonplaceholder.typicode.com/posts" # A free, dummy API
 
-# --- Data Extraction Functions ---
+# --- Data Extraction Functions
 
 def fetch_data_from_api(url: str) -> pd.DataFrame | None:
     """

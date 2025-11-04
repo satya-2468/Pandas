@@ -126,7 +126,7 @@ def clean_data(df: pd.DataFrame, config: Dict[str, Any]) -> pd.DataFrame:
     return df
 
 
-# ----------------------------- Analysis ---------------------------------
+# ----------------------------- Analysis -----------------------------
 def analyze_data(df: pd.DataFrame) -> Dict[str, Any]:
     """Perform simple analysis (groupby, aggregations, pivot)."""
     results: Dict[str, Any] = {}
