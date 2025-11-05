@@ -19,6 +19,7 @@ What this file demonstrates:
 """
 # ---- Testing new branch conflict in D
 
+# create a merge conflict new
 import pandas as pd
 import numpy as np
 
