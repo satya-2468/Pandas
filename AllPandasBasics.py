@@ -17,7 +17,7 @@ What this file demonstrates:
   - Aggregations and pivot tables
   - Exporting cleaned data
 """
-# create a merge conflict
+# create a merge conflict new
 import pandas as pd
 import numpy as np
 
